@@ -22,10 +22,10 @@ public class RacerMoveGui : MonoBehaviour
 	{
 		if (cp != null && cp.racer != null) {
 			var r = cp.racer;
-			var nextTarget = r.MoveEnd + r.MoveVector;
+			var nextTarget = r.Movement.MoveEnd + r.Movement.MoveVector;
 
 			if (moveStartMarker != null) {
-				moveStartMarker.position = r.MoveEnd + (Vector3.up * heightOffset);
+				moveStartMarker.position = r.Movement.MoveEnd + (Vector3.up * heightOffset);
 			}
 
 			if (moveTargetAreaMarker != null) {
@@ -48,8 +48,8 @@ public class RacerMoveGui : MonoBehaviour
 		var r = cp.racer;
 		var steer = (isSet) ? cp.ConfirmedSteering : cp.CurrentSteering;
 		steer = cp.racer.transform.rotation * steer;
-		var begin = (useNextMove) ? r.MoveEnd + r.MoveVector + steer : r.MoveEnd;
-		var v = r.MoveEnd + r.MoveVector + steer - r.MoveEnd;
+		var begin = (useNextMove) ? r.Movement.MoveEnd + r.Movement.MoveVector + steer : r.Movement.MoveEnd;
+		var v = r.Movement.MoveEnd + r.Movement.MoveVector + steer - r.Movement.MoveEnd;
 		if (marker != null) 
 		{
 			var vm = v.magnitude;

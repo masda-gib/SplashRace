@@ -3,7 +3,7 @@ using System.Collections;
 
 public class RacerCameraFollow : MonoBehaviour 
 {
-	public RacerInformation racerInfo;
+	public RacerBase racerBase;
 	public float behind = 4;
 	public float up = 1;
 	public float speed = 1;
@@ -18,12 +18,12 @@ public class RacerCameraFollow : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		var mv = racerInfo.MoveVector;
+		var mv = racerBase.Movement.MoveVector;
 		lookQuat = (mv.sqrMagnitude > 0.01f) ? Quaternion.LookRotation(mv) : lookQuat;
 		var offset = Vector3.forward * -1 * behind + Vector3.up * up;
 		offset = lookQuat * offset;
 
-		this.transform.position = Vector3.Lerp(this.transform.position, racerInfo.transform.position + offset, Time.deltaTime * speed);
+		this.transform.position = Vector3.Lerp(this.transform.position, racerBase.transform.position + offset, Time.deltaTime * speed);
 		this.transform.rotation = Quaternion.Slerp(this.transform.rotation, lookQuat, Time.deltaTime * speed);
 	}
 }

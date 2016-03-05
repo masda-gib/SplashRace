@@ -1,8 +1,25 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Events;
 
 public class RacerBase : RacerInformation 
 {
+	public bool IsOnTheMove { get; protected set; }
+	public Vector3 SteerVector { get; protected set; }
+
+	private RacerMovement movement;
+
+	public RacerMovement Movement {
+		get {
+			if (movement == null) {
+				movement = GetComponent<RacerMovement> ();
+			}
+			return movement;
+		}
+	}
+
+	public UnityEvent SteeringReset;
+
 	public Renderer debugObject;
 
 	public void SetSteerInput(Vector3 input)
@@ -19,8 +36,7 @@ public class RacerBase : RacerInformation
 
 	// Use this for initialization
 	void Start () {
-		MoveStart = transform.position;
-	
+
 	}
 	
 	// Update is called once per frame
@@ -33,16 +49,9 @@ public class RacerBase : RacerInformation
 		{
 			if (IsOnTheMove) 
 			{
-				transform.transform.position = MoveEnd;
-
-				var oldMoveVec = MoveVector;
-				MoveStart = MoveEnd;
-				var addMove = this.transform.rotation * this.SteerVector;
-				MoveVector = Vector3.ClampMagnitude(oldMoveVec + addMove, maxSpeed);
-				var lookQuat = (MoveVector.sqrMagnitude > 0.01f) ? Quaternion.LookRotation(MoveVector) : this.transform.rotation;
-				this.transform.rotation = lookQuat;
-
 				IsOnTheMove = false;
+
+				movement.EndProcessing (this);
 
 				this.SteerVector = Vector3.zero;
 				this.SteeringReset.Invoke ();
@@ -53,18 +62,21 @@ public class RacerBase : RacerInformation
 			if (!IsOnTheMove) 
 			{
 				IsOnTheMove = true;
-			}
-		}
 
-		if (debugObject != null && debugObject.material != null) 
-		{
-			debugObject.material.color = IsOnTheMove ? Color.green : Color.red;
+				movement.StartProcessing (this);
+			}
 		}
 			
 		if (IsOnTheMove) 
 		{
 			var t = (roundTime - actionPhaseLength) / movePhaseLength;
-			transform.transform.position = MoveStart + (MoveVector * t);
+
+			movement.Process (this, t);
+		}
+
+		if (debugObject != null && debugObject.material != null) 
+		{
+			debugObject.material.color = IsOnTheMove ? Color.green : Color.red;
 		}
 	}
 }
