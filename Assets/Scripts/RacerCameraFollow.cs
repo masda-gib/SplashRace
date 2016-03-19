@@ -18,7 +18,7 @@ public class RacerCameraFollow : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		var mv = racerBase.Movement.MoveVector;
+		var mv = racerBase.movement.MoveVector;
 		lookQuat = (mv.sqrMagnitude > 0.01f) ? Quaternion.LookRotation(mv) : lookQuat;
 		var offset = Vector3.forward * -1 * behind + Vector3.up * up;
 		offset = lookQuat * offset;

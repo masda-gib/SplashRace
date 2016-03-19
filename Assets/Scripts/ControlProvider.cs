@@ -12,11 +12,11 @@ public class ControlProvider : MonoBehaviour
 	public Vector3 CurrentSteerInput { get; private set; }
 	public Vector3 CurrentSteering
 	{
-		get { return racer.ConvertToSteerVector (CurrentSteerInput); }
+		get { return racer.movement.ConvertToSteerVector (CurrentSteerInput); }
 	}
 	public Vector3 ConfirmedSteering 
 	{
-		get { return (racer != null) ? racer.SteerVector : Vector3.zero; } 
+		get { return (racer != null) ? racer.movement.SteerVector : Vector3.zero; } 
 	}
 	public bool IsGettingSteerInput { get; private set; }
 	public int SelectedCardId { get; private set; }
@@ -30,7 +30,7 @@ public class ControlProvider : MonoBehaviour
 	void Start()
 	{
 		if (racer != null) {
-			racer.SteeringReset.AddListener (this.OnSteeringReset);
+			racer.movement.SteeringReset.AddListener (this.OnSteeringReset);
 		}
 	}
 	
@@ -39,11 +39,19 @@ public class ControlProvider : MonoBehaviour
 	{
 		CurrentSteerInput = new Vector3 (CrossPlatformInputManager.GetAxis ("Horizontal" + inputId), 0, CrossPlatformInputManager.GetAxis ("Vertical" + inputId));
 		IsGettingSteerInput = CrossPlatformInputManager.GetButton ("SteerInput" + inputId);
-		var confirm = CrossPlatformInputManager.GetButton ("SteerInput" + inputId);
 
-		if (!confirmSteering || confirm) {
+		if (!confirmSteering || IsGettingSteerInput) {
 			if (racer != null) {
-				racer.SetSteerInput (CurrentSteerInput);
+				racer.movement.SetSteerInput (CurrentSteerInput);
+			}
+		}
+
+		var abilityAToggle = CrossPlatformInputManager.GetButtonUp ("AbilityA" + inputId);
+		if (abilityAToggle) {
+			if (racer.abilities.GetActivatedState (racer.abilities.cardA)) {
+				racer.abilities.DeactivateAll ();
+			} else {
+				racer.abilities.ActivateCard (1);
 			}
 		}
 	}

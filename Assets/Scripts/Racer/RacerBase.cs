@@ -1,60 +1,54 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.Events;
+using System.Collections.Generic;
 
-public class RacerBase : RacerInformation 
+public class RacerBase : MonoBehaviour
 {
+	public RacerStatistics statistics;
+	public RacerMovement movement;
+	public RacerAbilities abilities;
+	public RacerModifiers modifiers;
+	public RacerCurrValues tempValues;
+
 	public bool IsOnTheMove { get; protected set; }
-	public Vector3 SteerVector { get; protected set; }
-
-	private RacerMovement movement;
-
-	public RacerMovement Movement {
-		get {
-			if (movement == null) {
-				movement = GetComponent<RacerMovement> ();
-			}
-			return movement;
-		}
-	}
-
-	public UnityEvent SteeringReset;
 
 	public Renderer debugObject;
 
-	public void SetSteerInput(Vector3 input)
-	{
-		this.SteerVector = ConvertToSteerVector(input);
-	}
-
-	public Vector3 ConvertToSteerVector(Vector3 input)
-	{
-		return input * this.steerRadius;
-	}
-
 	private float roundTime;
+
+	void Awake() {
+	}
 
 	// Use this for initialization
 	void Start () {
-
+		movement.Init (this);
+		abilities.Init (this);
+		movement.SteeringReset.AddListener (InitTempValues);
+		modifiers.ModifiersChanged.AddListener (InitTempValues);
+		InitTempValues ();
 	}
-	
+
+	protected void InitTempValues()
+	{
+		statistics.FillTempValues(tempValues);
+		movement.FillTempValues(tempValues);
+		modifiers.ModifyTempValues (tempValues);
+	}
+
 	// Update is called once per frame
 	void Update () 
 	{
 		var timer = Time.time;
 
-		roundTime = timer % (actionPhaseLength + movePhaseLength);
-		if (roundTime < actionPhaseLength) 
+		roundTime = timer % (statistics.actionPhaseLength + statistics.movePhaseLength);
+		if (roundTime < statistics.actionPhaseLength) 
 		{
 			if (IsOnTheMove) 
 			{
 				IsOnTheMove = false;
 
-				movement.EndProcessing (this);
-
-				this.SteerVector = Vector3.zero;
-				this.SteeringReset.Invoke ();
+				movement.EndProcessing ();
 			}
 		}
 		else 
@@ -63,15 +57,15 @@ public class RacerBase : RacerInformation
 			{
 				IsOnTheMove = true;
 
-				movement.StartProcessing (this);
+				movement.StartProcessing ();
 			}
 		}
 			
 		if (IsOnTheMove) 
 		{
-			var t = (roundTime - actionPhaseLength) / movePhaseLength;
+			var t = (roundTime - statistics.actionPhaseLength) / statistics.movePhaseLength;
 
-			movement.Process (this, t);
+			movement.Process (t);
 		}
 
 		if (debugObject != null && debugObject.material != null) 

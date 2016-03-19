@@ -22,15 +22,15 @@ public class RacerMoveGui : MonoBehaviour
 	{
 		if (cp != null && cp.racer != null) {
 			var r = cp.racer;
-			var nextTarget = r.Movement.MoveEnd + r.Movement.MoveVector;
+			var nextTarget = r.movement.MoveEnd + r.movement.MoveVector;
 
 			if (moveStartMarker != null) {
-				moveStartMarker.position = r.Movement.MoveEnd + (Vector3.up * heightOffset);
+				moveStartMarker.position = r.movement.MoveEnd + (Vector3.up * heightOffset);
 			}
 
 			if (moveTargetAreaMarker != null) {
 				moveTargetAreaMarker.position = nextTarget + (Vector3.up * heightOffset);
-				moveTargetAreaMarker.localScale = new Vector3 (r.steerRadius * 2, 1, r.steerRadius * 2);
+				moveTargetAreaMarker.localScale = new Vector3 (r.tempValues.steerRadius * 2, 1, r.tempValues.steerRadius * 2);
 			}
 
 			var endMarker = SetMoveMarker (steerInputVectorMarker, cp, false);
@@ -48,8 +48,8 @@ public class RacerMoveGui : MonoBehaviour
 		var r = cp.racer;
 		var steer = (isSet) ? cp.ConfirmedSteering : cp.CurrentSteering;
 		steer = cp.racer.transform.rotation * steer;
-		var begin = (useNextMove) ? r.Movement.MoveEnd + r.Movement.MoveVector + steer : r.Movement.MoveEnd;
-		var v = r.Movement.MoveEnd + r.Movement.MoveVector + steer - r.Movement.MoveEnd;
+		var begin = (useNextMove) ? r.movement.MoveEnd + r.movement.MoveVector + steer : r.movement.MoveEnd;
+		var v = r.movement.MoveEnd + r.movement.MoveVector + steer - r.movement.MoveEnd;
 		if (marker != null) 
 		{
 			var vm = v.magnitude;
