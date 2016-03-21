@@ -30,7 +30,7 @@ public class RacerMoveGui : MonoBehaviour
 
 			if (moveTargetAreaMarker != null) {
 				moveTargetAreaMarker.position = nextTarget + (Vector3.up * heightOffset);
-				moveTargetAreaMarker.localScale = new Vector3 (r.tempValues.steerRadius * 2, 1, r.tempValues.steerRadius * 2);
+				moveTargetAreaMarker.localScale = new Vector3 (r.tempValues.statistics.GetSteerRadiusFor(0) * 2, 1, r.tempValues.statistics.GetSteerRadiusFor(0) * 2);
 			}
 
 			var endMarker = SetMoveMarker (steerInputVectorMarker, cp, false);

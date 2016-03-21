@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class RacerBase : MonoBehaviour
 {
+	public RaceMatch match;
+
 	public RacerStatistics statistics;
 	public RacerMovement movement;
 	public RacerAbilities abilities;
@@ -18,6 +20,7 @@ public class RacerBase : MonoBehaviour
 	private float roundTime;
 
 	void Awake() {
+		this.tempValues = ScriptableObject.CreateInstance<RacerCurrValues> ();
 	}
 
 	// Use this for initialization
@@ -31,46 +34,41 @@ public class RacerBase : MonoBehaviour
 
 	protected void InitTempValues()
 	{
-		statistics.FillTempValues(tempValues);
-		movement.FillTempValues(tempValues);
+		statistics.CopyValuesTo(tempValues.statistics);
+		movement.CopyValuesTo(tempValues);
 		modifiers.ModifyTempValues (tempValues);
 	}
 
 	// Update is called once per frame
 	void Update () 
 	{
-		var timer = Time.time;
+		if (match != null) {
+			var timer = Time.time;
 
-		roundTime = timer % (statistics.actionPhaseLength + statistics.movePhaseLength);
-		if (roundTime < statistics.actionPhaseLength) 
-		{
-			if (IsOnTheMove) 
-			{
-				IsOnTheMove = false;
+			roundTime = timer % (match.actionPhaseLength + match.movePhaseLength);
+			if (roundTime < match.actionPhaseLength) {
+				if (IsOnTheMove) {
+					IsOnTheMove = false;
 
-				movement.EndProcessing ();
+					movement.EndProcessing ();
+				}
+			} else {
+				if (!IsOnTheMove) {
+					IsOnTheMove = true;
+
+					movement.StartProcessing ();
+				}
 			}
-		}
-		else 
-		{
-			if (!IsOnTheMove) 
-			{
-				IsOnTheMove = true;
-
-				movement.StartProcessing ();
-			}
-		}
 			
-		if (IsOnTheMove) 
-		{
-			var t = (roundTime - statistics.actionPhaseLength) / statistics.movePhaseLength;
+			if (IsOnTheMove) {
+				var t = (roundTime - match.actionPhaseLength) / match.movePhaseLength;
 
-			movement.Process (t);
-		}
+				movement.Process (t);
+			}
 
-		if (debugObject != null && debugObject.material != null) 
-		{
-			debugObject.material.color = IsOnTheMove ? Color.green : Color.red;
+			if (debugObject != null && debugObject.material != null) {
+				debugObject.material.color = IsOnTheMove ? Color.green : Color.red;
+			}
 		}
 	}
 }

@@ -10,6 +10,8 @@ public class SelfSteerModifier : RacerModifier {
 
 	public override void ModifyTempValues (RacerCurrValues tempValues)
 	{
-		tempValues.steerRadius *= ratio;
+		tempValues.statistics.handlingWater[0] *= ratio;
+		tempValues.statistics.handlingLand[0] *= ratio;
+		tempValues.statistics.handlingCurb[0] *= ratio;
 	}
 }
